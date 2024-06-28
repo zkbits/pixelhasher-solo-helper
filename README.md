@@ -29,7 +29,7 @@ Install the installer called [mise](https://mise.jdx.dev/):
 curl https://mise.run | sh
 ```
 
-Add the following the bottom of your `~/.profile`:
+Ignore any instructions that `mise` prints. Just add the following the bottom of your `~/.profile`:
 ```
 export PATH=$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH
 ```
