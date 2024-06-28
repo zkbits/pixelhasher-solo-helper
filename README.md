@@ -52,7 +52,7 @@ After that, things should look approximately like this:
 $ which python
 /home/dev/.local/share/mise/shims/python
 $ python --version
-Python 3.12.4
+Python 3.12.2
 $ which pipenv
 /home/dev/.local/share/mise/shims/pipenv
 ```
