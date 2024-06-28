@@ -17,7 +17,7 @@ Your system probably already has Python, but it may not be the right version, an
 
 First, install dependencies Python needs. If you're on Ubuntu, run the following as root, or use `sudo`:
 ```
-apt install -y build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+apt install -y build-essential clang libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 ```
 
 If you're not on Ubuntu, [here's some information about how to get the dependencies for your system](https://github.com/pyenv/pyenv/wiki#suggested-build-environment).
@@ -41,8 +41,8 @@ source ~/.profile
 
 Finally, use `mise` to install a modern Python:
 ```
-mise install python@3.12.4
-mise use -g python@3.12.4
+mise install python@3.12.2
+mise use -g python@3.12.2
 pip install pipenv
 mise reshim
 ```
