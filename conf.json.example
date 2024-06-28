@@ -1,0 +1,6 @@
+{
+  "port": 17890,
+  "privateKey": "0x...",
+  "providerHttpUrl": "https://mainnet.era.zksync.io",
+  "providerWebsocketUrl": "wss://mainnet.era.zksync.io/ws"
+}

@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+web3 = "*"
+colorlog = "*"
+requests = "*"
+
+[dev-packages]
+flake8 = "*"
+pylint = "*"
+black = "*"
+web3 = {extras = ["tester"], version = "*"}
+
+[requires]
+python_version = "3.12"
