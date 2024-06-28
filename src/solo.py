@@ -358,7 +358,13 @@ def check_basics():
     )
 
 
+def touch(path):
+    with open(path, "a"):
+        os.utime(path, None)
+
+
 if __name__ == "__main__":
+    touch(SPRITES_DONE_FILENAME)
     check_basics()
     pool_address = Account.from_key(CONF["privateKey"]).address
     server = Server(CONF["port"], pool_address)
