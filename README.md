@@ -11,12 +11,60 @@ If you have problems, please join the [zkBits Discord][2] and we'll help.
 
 Ubuntu 24.04 is recommended, but any similar system will work.
 
-Install Python 3. Make sure with `python --version`.
+### Python
 
-Clone the repo: `git clone https://github.com/zkbits/pixelhasher-solo-helper.git`
+Your system probably already has Python, but it may not be the right version, and your system may not offer the version we want. What we need to do is to leave the system Python alone, but install a more modern version that's available to our mining user.
+
+First, install dependencies Python needs. If you're on Ubuntu, run the following as root, or use `sudo`:
+```
+apt install -y build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+```
+
+If you're not on Ubuntu, [here's some information about how to get the dependencies for your system](https://github.com/pyenv/pyenv/wiki#suggested-build-environment).
+
+Switch to the user you intend to use for mining, if different from root. This can be an ordinary user, because we're going to install the tools and Python into a home directory, not the system.
+
+Install the installer called [mise](https://mise.jdx.dev/):
+```
+curl https://mise.run | sh
+```
+
+Add the following the bottom of your `~/.profile`:
+```
+export PATH=$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH
+```
+
+... and source it:
+```
+source ~/.profile
+```
+
+Finally, use `mise` to install a modern Python:
+```
+mise install python@3.12.4
+mise use -g python@3.12.4
+pip install pipenv
+mise reshim
+```
+
+After that, things should look approximately like this:
+```
+$ which python
+/home/dev/.local/share/mise/shims/python
+$ python --version
+Python 3.12.4
+$ which pipenv
+/home/dev/.local/share/mise/shims/pipenv
+```
+
+### Installing and running this project
+
+Clone the repo:
+```
+git clone https://github.com/zkbits/pixelhasher-solo-helper.git
+```
 
 Install the dependencies:
-
 ```
 cd pixelhasher-solo-helper
 pipenv install
