@@ -343,18 +343,19 @@ def check_basics():
         f"configure `privateKey` in {util.CONF_FILENAME}",
     )
     check_or_die(
-        web3_http_provider_works, f"configure `providerHttpUrl` in {util.CONF_FILENAME}"
+        web3_http_provider_works,
+        f"configure `providerHttpUrl` in {util.CONF_FILENAME}, or just try again",
     )
     check_or_die(
         web3_websocket_provider_works,
-        f"configure `providerWebsocketUrl` in {util.CONF_FILENAME}",
+        f"configure `providerWebsocketUrl` in {util.CONF_FILENAME}, or just try again",
     )
     check_or_die(
         lambda: os.path.exists(SPRITES_FILENAME), f"configure {SPRITES_FILENAME}"
     )
     check_or_die(
         lambda: len(sprites_get_remaining()) > 0,
-        f"no sprites remaining. add some to {SPRITES_FILENAME}",
+        f"no sprites remaining. compare {SPRITES_FILENAME} and {SPRITES_DONE_FILENAME}",
     )
 
 
