@@ -1,4 +1,5 @@
 import binascii
+import errno
 import json
 import os
 import queue
@@ -72,7 +73,11 @@ class ClientHandler:
             try:
                 s = data.decode("utf-8")
                 m = json.loads(s)
-                LOGGER.debug("%s %s", self.address, repr(m))
+                if "method" in m and m["method"] == "ping":
+                    # ping is too noisy
+                    pass
+                else:
+                    LOGGER.debug("%s %s", self.address, repr(m))
                 self.messages_from_clients.put(m)
             except ValueError:
                 LOGGER.warning(
@@ -83,7 +88,14 @@ class ClientHandler:
         LOGGER.debug("%s handler thread ending", self.address)
 
     def send(self, s):
-        self.sock.send(s.encode("utf-8"))
+        try:
+            self.sock.send(s.encode("utf-8"))
+        except socket.error as e:
+            if e.errno == errno.EPIPE:
+                LOGGER.warning("%s seems to have closed its connection", self.address)
+                self.sock.close()
+                self.client_handler_db.remove(self.address)
+                LOGGER.debug("%s handler thread ending", self.address)
 
 
 class Server:
@@ -169,15 +181,19 @@ class Server:
 
     def poll_for_mining_parameters(self):
         while True:
-            mt = zkbitcoin_get_mining_target()
-            cn = zkbitcoin_get_challenge_number()
-            if mt != self.mining_target or cn != self.challenge_number:
-                LOGGER.info("new mining parameters: mt=%s cn=%s", mt, cn)
-                self.mining_target = mt
-                self.challenge_number = cn
-                self.set_mining_parameters(mt, cn)
-                self.send_work_message_to_clients()
-            time.sleep(8)
+            try:
+                mt = zkbitcoin_get_mining_target()
+                cn = zkbitcoin_get_challenge_number()
+                if mt != self.mining_target or cn != self.challenge_number:
+                    LOGGER.info("new mining parameters: mt=%s cn=%s", mt, cn)
+                    self.mining_target = mt
+                    self.challenge_number = cn
+                    self.set_mining_parameters(mt, cn)
+                    self.send_work_message_to_clients()
+                time.sleep(8)
+            except Exception as e:
+                LOGGER.exception(e)
+                time.sleep(1)
 
     def send_work_message_to_clients(self):
         if self.work_message:
@@ -189,12 +205,14 @@ class Server:
         while True:
             try:
                 m = self.messages_from_clients.get()
-                LOGGER.info("message from miner: %s", repr(m))
                 if "method" in m and m["method"] == "submit_solution":
+                    LOGGER.info("message from miner: %s", repr(m))
                     threading.Thread(target=self.submit_solution, args=(m,)).start()
                 elif "method" in m and m["method"] == "ping":
+                    # ping is too noisy
                     pass
                 else:
+                    LOGGER.info("message from miner: %s", repr(m))
                     LOGGER.warning("did not understand message")
             except Exception as e:
                 LOGGER.exception(e)
@@ -215,6 +233,7 @@ class Server:
         LOGGER.debug("miner_address: %s", repr(miner_address))
         LOGGER.debug("nonce: %s", repr(nonce))
         num_tries = 3
+        success = False
         for n in range(1, num_tries + 1):
             try:
                 LOGGER.debug("attempt %s/%s", n, num_tries)
@@ -240,11 +259,13 @@ class Server:
                 LOGGER.debug("tx_hash: %s", tx_hash)
                 w3.eth.wait_for_transaction_receipt(tx_hash)
                 LOGGER.info("got receipt")
-                self.submitted_solution_successfully()
+                success = True
                 break
             except Exception as e:
                 LOGGER.exception(e)
                 time.sleep(1)
+        if success:
+            self.submitted_solution_successfully()
 
     def submitted_solution_successfully(self):
         LOGGER.info("submitted solution successfully")
@@ -360,7 +381,7 @@ def check_basics():
 
 
 def touch(path):
-    with open(path, "a"):
+    with open(path, "a", encoding="utf-8"):
         os.utime(path, None)
 
 
